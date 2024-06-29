@@ -1,0 +1,165 @@
+Project Structure
+LibraryManagementSystem/
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   ├── model/
+│   │   │   │   └── Book.java
+│   │   │   │   └── Member.java
+│   │   │   │   └── Loan.java
+│   │   │   ├── dao/
+│   │   │   │   └── BookDAO.java
+│   │   │   │   └── MemberDAO.java
+│   │   │   │   └── LoanDAO.java
+│   │   │   ├── util/
+│   │   │   │   └── DatabaseConnection.java
+│   │   │   ├── gui/
+│   │   │   │   └── LibraryManagementSystem.java
+│   │   │   │   └── AddBookForm.java
+│   │   │   │   └── AddMemberForm.java
+│   │   │   │   └── IssueBookForm.java
+│   │   │   │   └── ReturnBookForm.java
+│   │   │   └── App.java
+│   │   └── resources/
+│   └── test/
+
+ERD Diagram:
++-------------+        +-------------+        +-------------+
+|    Member   |        |     Loan    |        |     Book    |
++-------------+        +-------------+        +-------------+
+| MemberID PK |<------>| LoanID PK   |<------>| BookID PK   |
+| FirstName   |        | BookID FK   |        | Title       |
+| LastName    |        | MemberID FK |        | Author      |
+| Address     |        | IssueDate   |        | Publisher   |
+| PhoneNumber |        | DueDate     |        | YearPublished|
+| Email       |        | ReturnDate  |        | ISBN        |
++-------------+        +-------------+        | Category    |
+                                              | CopiesAvailable|
+                                              +-------------+
+
+	//USER
+	
+	
+	
+//SQL Schema
+CREATE TABLE Member (
+    MemberID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Address VARCHAR(100),
+    PhoneNumber VARCHAR(20),
+    Email VARCHAR(50)
+);
+
+CREATE TABLE Book (
+    BookID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(100),
+    Author VARCHAR(100),
+    Publisher VARCHAR(100),
+    YearPublished INT,
+    ISBN VARCHAR(20),
+    Category VARCHAR(50),
+    CopiesAvailable INT
+);
+
+CREATE TABLE Loan (
+    LoanID INT PRIMARY KEY AUTO_INCREMENT,
+    BookID INT,
+    MemberID INT,
+    IssueDate DATE,
+    DueDate DATE,
+    ReturnDate DATE,
+    FOREIGN KEY (BookID) REFERENCES Book(BookID),
+    FOREIGN KEY (MemberID) REFERENCES Member(MemberID)
+);
+
+            
+            
+Book Table
+BookID (Primary Key)
+
+Purpose: Uniquely identifies each book in the library.
+Role: Used as a reference to this book in other tables (like the Loan table).
+Title
+
+Purpose: Stores the title of the book.
+Role: Used for displaying and searching book titles.
+Author
+
+Purpose: Stores the name of the author of the book.
+Role: Useful for searching books by the author's name and for displaying author information.
+Publisher
+
+Purpose: Stores the name of the publisher of the book.
+Role: Provides information about the book’s publisher, useful for cataloging and search purposes.
+YearPublished
+
+Purpose: Stores the year the book was published.
+Role: Used to provide publication information, useful for sorting and searching books by year.
+ISBN
+
+Purpose: Stores the International Standard Book Number, a unique identifier for books.
+Role: Used for uniquely identifying and searching for specific editions of books.
+Category
+
+Purpose: Stores the category or genre of the book.
+Role: Useful for organizing, sorting, and searching books by genre or category.
+CopiesAvailable
+
+Purpose: Stores the number of copies of the book that are currently available for loan.
+Role: Used to track the availability of the book and manage inventory.
+Member Table
+MemberID (Primary Key)
+
+Purpose: Uniquely identifies each member of the library.
+Role: Used as a reference to this member in other tables (like the Loan table).
+FirstName
+
+Purpose: Stores the first name of the member.
+Role: Used for displaying and searching member information.
+LastName
+
+Purpose: Stores the last name of the member.
+Role: Used for displaying and searching member information.
+Address
+
+Purpose: Stores the address of the member.
+Role: Useful for contact purposes and member record keeping.
+PhoneNumber
+
+Purpose: Stores the phone number of the member.
+Role: Used for contacting members regarding overdue books or other library communications.
+Email
+
+Purpose: Stores the email address of the member.
+Role: Used for electronic communication with members, such as sending notifications or reminders.
+Loan Table
+LoanID (Primary Key)
+
+Purpose: Uniquely identifies each loan transaction.
+Role: Used to manage and track individual loan records.
+BookID (Foreign Key from Book)
+
+Purpose: References the BookID from the Book table.
+Role: Links each loan record to a specific book, indicating which book is being loaned.
+MemberID (Foreign Key from Member)
+
+Purpose: References the MemberID from the Member table.
+Role: Links each loan record to a specific member, indicating who has borrowed the book.
+IssueDate
+
+Purpose: Stores the date when the book was issued to the member.
+Role: Used to track when a book was borrowed, important for due date calculations and record keeping.
+DueDate
+
+Purpose: Stores the date when the book is due to be returned.
+Role: Helps manage and enforce the loan period, used for notifying members about due dates and calculating fines for overdue books.
+ReturnDate
+
+Purpose: Stores the date when the book was actually returned by the member.
+Role: Used to complete the loan record and calculate any overdue fines or penalties if the book is returned late.     
+                 
+                                             
+                                              
+
