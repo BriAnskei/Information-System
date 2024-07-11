@@ -9,12 +9,14 @@ public class Book {
 	private String isbn;
 	private String category;
 	private int copiesAvailable;
+
+	private byte[] imageData;
 	
-	// Constructor
+	// Constructors
 	public Book() {}
 	
 	
-	public Book(int bookID,  String tittle, String author, String publisher, int yearPublish,  String isbn, String category, int copiesAvailable) {
+	public Book(int bookID,  String tittle, String author, String publisher, int yearPublish,  String isbn, String category, int copiesAvailable, byte[] imageData) {
 		this.bookID = bookID;
 		this.tittle = tittle;
 		this.author = author;
@@ -23,6 +25,7 @@ public class Book {
 		this.isbn = isbn;
 		this.category = category;
 		this.copiesAvailable = copiesAvailable;
+		this.imageData = imageData;
 	}
 	
 	public int getBookID() {
@@ -88,4 +91,12 @@ public class Book {
 	public void setCopiesAvailable(int copiesAvailable) {
 		this.copiesAvailable = copiesAvailable;
 	}
+	
+	public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
 }

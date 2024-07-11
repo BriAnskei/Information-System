@@ -19,14 +19,16 @@ public class MemberService {
         this.memberDAO = new MemberDAO();
     }
 
-    public void addMember(String firstName, String lastName, String address, String phoneNumber, String email, File selectedFile) throws SQLException, IOException {
+    public void addMember(int userID, String firstName, String lastName, String address, String phoneNumber, String email, File selectedFile) throws SQLException, IOException {
         Member member = new Member();
+        member.setUserId(userID);
         member.setFirstName(firstName);
         member.setLastName(lastName);
         member.setAddress(address);
         member.setPhoneNumber(phoneNumber);
         member.setEmail(email);
 
+        // Convert File into byte before storing in DB.
         if (selectedFile != null) {
             try (FileInputStream fis = new FileInputStream(selectedFile)) {
                 byte[] imageBytes = ImageUtil.convertInputStreamToByteArray(fis);
@@ -51,5 +53,13 @@ public class MemberService {
 
     public List<Member> getAllMembers() throws SQLException {
         return memberDAO.getAllMembers();
+    }
+    
+    public boolean checkMembership(int userId) {
+    	return memberDAO.membershipValidation(userId);
+    }
+    
+    public Member getMemberdetails(int userId) {
+    	return memberDAO.getMemberByUserId(userId);
     }
 }

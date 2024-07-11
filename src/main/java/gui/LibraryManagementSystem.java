@@ -1,7 +1,5 @@
 package main.java.gui;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -10,19 +8,25 @@ import java.awt.Color;
 import javax.swing.border.MatteBorder;
 
 import main.java.Callback.MemberUpdateCallback;
-import main.java.dao.MemberDAO;
+import main.java.dao.*;
+import main.java.model.*;
+import main.java.util.ImageUtil;
 import main.java.Callback.*;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 
-public class LibraryManagementSystem extends JFrame implements MemberUpdateCallback {
+public class LibraryManagementSystem extends JFrame implements MemberUpdateCallback, BookUpdateCallback, IssueUpdateCallback {
 
 	/**
 	 * 
@@ -30,30 +34,19 @@ public class LibraryManagementSystem extends JFrame implements MemberUpdateCallb
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JLabel memberCountLabel;
+	private JLabel bookLabel;
+	private JLabel issueBookLabel;
+	
+	private JLabel bookImage1;
+	private JLabel bookImage2;
+	private JLabel bookImage3;
+	private JLabel bookImage4;
+	private JLabel bookImage5;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					LibraryManagementSystem frame = new LibraryManagementSystem();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 * @throws SQLException 
-	 */
-	public LibraryManagementSystem() throws SQLException {
+	
+	public LibraryManagementSystem() throws SQLException, IOException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 900, 500);
+		setBounds(100, 100, 900, 485);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(205, 205, 205));
 		contentPane.setForeground(new Color(226, 35, 40));
@@ -80,41 +73,54 @@ public class LibraryManagementSystem extends JFrame implements MemberUpdateCallb
 		bookNavLabel.setBounds(10, 0, 80, 30);
 		BookNav.add(bookNavLabel);
 		
-		JLabel lblNewLabel_1 = new JLabel("0");
-		lblNewLabel_1.setVerticalAlignment(SwingConstants.TOP);
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 50));
-		lblNewLabel_1.setBounds(73, 41, 46, 71);
-		bookCard.add(lblNewLabel_1);
+		bookLabel = new JLabel("0");
+		bookLabel.setVerticalAlignment(SwingConstants.TOP);
+		bookLabel.setFont(new Font("Tahoma", Font.PLAIN, 50));
+		bookLabel.setBounds(0, 41, 190, 71);
+		bookLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		bookCard.add(bookLabel);
 		
 		JPanel NavigationPanel = new JPanel();
 		NavigationPanel.setBackground(Color.RED);
-		NavigationPanel.setForeground(Color.RED);
 		NavigationPanel.setBorder(new MatteBorder(0, 0, 1, 0, (Color) new Color(0, 0, 0)));
 		NavigationPanel.setBounds(0, 0, 884, 70);
 		contentPane.add(NavigationPanel);
 		NavigationPanel.setLayout(null);
 		
+		
 		JButton btnBook = new JButton("BOOKS");
-		btnBook.setFont(new Font("Tahoma", Font.BOLD, 10));
-		btnBook.setBackground(new Color(192, 192, 192));
+		btnBook.setForeground(new Color(255, 255, 255));
+		btnBook.setBorder(BorderFactory.createEmptyBorder());
+		btnBook.setBorderPainted(false);
+		btnBook.setFocusPainted(false);
+		btnBook.setContentAreaFilled(false);
+		btnBook.setFont(new Font("Tahoma", Font.BOLD, 18));
+		btnBook.setBackground(Color.red);
 		btnBook.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				BookList bookList = new BookList(LibraryManagementSystem.this);
+				bookList.setVisible(true);
 			}
 		});
-		btnBook.setBounds(558, 18, 95, 35);
+		btnBook.setBounds(455, 18, 120, 35);
 		NavigationPanel.add(btnBook);
 		
 		
 		JButton btnMember = new JButton("MEMBER");
+		btnMember.setForeground(new Color(255, 255, 255));
+		btnMember.setBorder(BorderFactory.createEmptyBorder());
+		btnMember.setBorderPainted(false);
+		btnMember.setFocusPainted(false);
+		btnMember.setContentAreaFilled(false);
 		btnMember.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MemberList memberList = new MemberList(LibraryManagementSystem.this);
 				memberList.setVisible(true); // Open Window
 			}
 		});
-		btnMember.setFont(new Font("Tahoma", Font.BOLD, 10));
+		btnMember.setFont(new Font("Tahoma", Font.BOLD, 18));
 		btnMember.setBackground(new Color(192, 192, 192));
-		btnMember.setBounds(663, 18, 95, 35);
+		btnMember.setBounds(585, 18, 129, 35);
 		NavigationPanel.add(btnMember);
 		
 		
@@ -132,9 +138,20 @@ public class LibraryManagementSystem extends JFrame implements MemberUpdateCallb
 		NavigationPanel.add(logoNavLabel);
 		
 		JButton btnCirculate = new JButton("CIRCULATE");
-		btnCirculate.setFont(new Font("Tahoma", Font.BOLD, 10));
-		btnCirculate.setBackground(Color.LIGHT_GRAY);
-		btnCirculate.setBounds(767, 18, 95, 35);
+		btnCirculate.setForeground(new Color(255, 255, 255));
+		btnCirculate.setBorder(BorderFactory.createEmptyBorder());
+		btnCirculate.setBorderPainted(false);
+		btnCirculate.setFocusPainted(false);
+		btnCirculate.setContentAreaFilled(false);
+		btnCirculate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Circulation circulate = new Circulation(LibraryManagementSystem.this);
+				circulate.setVisible(true);
+			}
+		});
+		btnCirculate.setFont(new Font("Tahoma", Font.BOLD, 18));
+		btnCirculate.setBackground(new Color(192, 192, 192));
+		btnCirculate.setBounds(724, 18, 150, 35);
 		NavigationPanel.add(btnCirculate);
 		
 		JPanel memberCard = new JPanel();
@@ -158,7 +175,8 @@ public class LibraryManagementSystem extends JFrame implements MemberUpdateCallb
 	    memberCountLabel = new JLabel("0");
 		memberCountLabel.setVerticalAlignment(SwingConstants.TOP);
 		memberCountLabel.setFont(new Font("Tahoma", Font.PLAIN, 50));
-		memberCountLabel.setBounds(73, 41, 46, 71);
+		memberCountLabel.setBounds(0, 41, 190, 71);
+		memberCountLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		memberCard.add(memberCountLabel);
 		
 		JPanel bookCard_2 = new JPanel();
@@ -173,18 +191,19 @@ public class LibraryManagementSystem extends JFrame implements MemberUpdateCallb
 		BookCardLabel_2.setBounds(0, 0, 190, 30);
 		bookCard_2.add(BookCardLabel_2);
 		
-		JLabel authorNavLabel = new JLabel("Authors");
-		authorNavLabel.setForeground(Color.WHITE);
-		authorNavLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
-		authorNavLabel.setBounds(10, 0, 80, 30);
-		BookCardLabel_2.add(authorNavLabel);
+		JLabel issuesNavLabel = new JLabel("Issued");
+		issuesNavLabel.setForeground(Color.WHITE);
+		issuesNavLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
+		issuesNavLabel.setBounds(10, 0, 80, 30);
+		BookCardLabel_2.add(issuesNavLabel);
 		
-		JLabel lblNewLabel_1_2 = new JLabel("0");
-		lblNewLabel_1_2.setBackground(new Color(172, 89, 255));
-		lblNewLabel_1_2.setVerticalAlignment(SwingConstants.TOP);
-		lblNewLabel_1_2.setFont(new Font("Tahoma", Font.PLAIN, 50));
-		lblNewLabel_1_2.setBounds(73, 41, 46, 71);
-		bookCard_2.add(lblNewLabel_1_2);
+		issueBookLabel = new JLabel("0");
+		issueBookLabel.setBackground(new Color(172, 89, 255));
+		issueBookLabel.setVerticalAlignment(SwingConstants.TOP);
+		issueBookLabel.setFont(new Font("Tahoma", Font.PLAIN, 50));
+		issueBookLabel.setBounds(0, 41, 190, 71);
+		issueBookLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		bookCard_2.add(issueBookLabel);
 		
 		JPanel bookList = new JPanel();
 		bookList.setBackground(new Color(47, 47, 255));
@@ -204,30 +223,54 @@ public class LibraryManagementSystem extends JFrame implements MemberUpdateCallb
 		lblLatestBookAdded.setForeground(Color.WHITE);
 		lblLatestBookAdded.setFont(new Font("Tahoma", Font.BOLD, 15));
 		
-		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setBounds(141, 57, 107, 109);
-		bookList.add(lblNewLabel);
+		bookImage1 = new JLabel("New label");
+		bookImage1.setBounds(141, 57, 107, 109);
+		bookList.add(bookImage1);
 		
-		JLabel lblNewLabel_2 = new JLabel("New label");
-		lblNewLabel_2.setBounds(299, 57, 107, 109);
-		bookList.add(lblNewLabel_2);
+		bookImage2 = new JLabel("New label");
+		bookImage2.setBounds(299, 57, 107, 109);
+		bookList.add(bookImage2);
 		
-		JLabel lblNewLabel_3 = new JLabel("New label");
-		lblNewLabel_3.setBounds(439, 57, 107, 109);
-		bookList.add(lblNewLabel_3);
+		bookImage3 = new JLabel("New label");
+		bookImage3.setBounds(439, 57, 107, 109);
+		bookList.add(bookImage3);
 		
-		JLabel lblNewLabel_4 = new JLabel("New label");
-		lblNewLabel_4.setBounds(584, 57, 107, 109);
-		bookList.add(lblNewLabel_4);
+		bookImage4 = new JLabel("New label");
+		bookImage4.setBounds(584, 57, 107, 109);
+		bookList.add(bookImage4);
 		
-		JLabel lblNewLabel_5 = new JLabel("New label");
-		lblNewLabel_5.setBounds(735, 57, 107, 109);
-		bookList.add(lblNewLabel_5);
+		bookImage5 = new JLabel("New label");
+		bookImage5.setBounds(735, 57, 107, 109);
+		bookList.add(bookImage5);
+		
+		JButton btnLogOut = new JButton("Log out");
+		btnLogOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				LoginForm login = new LoginForm();
+				login.setVisible(true);
+				dispose();
+			}
+		});
+		btnLogOut.setForeground(Color.BLUE);
+		btnLogOut.setFont(new Font("Tahoma", Font.BOLD, 8));
+		btnLogOut.setFocusPainted(false);
+		btnLogOut.setContentAreaFilled(false);
+		btnLogOut.setBorderPainted(false);
+		btnLogOut.setBorder(BorderFactory.createEmptyBorder());
+		btnLogOut.setBackground(Color.LIGHT_GRAY);
+		btnLogOut.setBounds(800, 243, 84, 15);
+		contentPane.add(btnLogOut);
 		
 		initializeTotalMembers(); 
+		initializeTotalBooks();
+		initializeTotalIssued();
+		initializeLatestBooksImg();
 	}
 	
 	MemberDAO memberDAO = new MemberDAO();
+	BookDAO bookDAO = new BookDAO();
+	LoanDAO loanDAO = new LoanDAO();
+	
 	@Override
     public void onMemberListUpdated() {
 		try {
@@ -238,7 +281,50 @@ public class LibraryManagementSystem extends JFrame implements MemberUpdateCallb
 		}
     }
 	
+	@Override
+	public void onBookListUpdated() {
+		try {
+			initializeLatestBooksImg();// Update the latest book image display.
+			initializeTotalBooks();
+		} catch (SQLException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void onIssueListUpdate() {
+		try {
+			initializeTotalIssued();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private void initializeTotalMembers() throws SQLException {
 		memberCountLabel.setText(Integer.toString(memberDAO.countTotalMember()));
+	}
+	
+	private void initializeTotalIssued() throws SQLException {
+		issueBookLabel.setText(Integer.toString(loanDAO.countTotalLoans()));
+	}
+	
+	private void initializeTotalBooks() throws SQLException {
+		bookLabel.setText(Integer.toString(bookDAO.countTotalBooks()));
+	}
+	
+	private void initializeLatestBooksImg() throws SQLException, IOException {
+		List<Book> latestBooks = bookDAO.getLatesBooks();
+		JLabel[] arrImageLabels = {bookImage1, bookImage2, bookImage3, bookImage4, bookImage5};
+		for(int i = 0; i < latestBooks.size() && i < 5; i++) {
+			Book book = latestBooks.get(i);
+			
+			 BufferedImage buffedImg = ImageUtil.convertByteArrayToBufferedImage(book.getImageData());
+			
+			ImageIcon icon = new ImageIcon(ImageUtil.resizeImage(buffedImg, arrImageLabels[i].getWidth(), arrImageLabels[i].getHeight()));
+			arrImageLabels[i].setIcon(icon);
+			
+		}
 	}
 }

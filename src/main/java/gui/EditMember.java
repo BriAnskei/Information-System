@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -135,15 +137,14 @@ public class EditMember extends JFrame {
 	             String phoneNumber = userNumber.getText();
 	             String email = userEmail.getText();
 				
-					try {
-						editMember(firstName, lastName, address, phoneNumber, email, memberId);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					
+						try {
+							editMember(firstName, lastName, address, phoneNumber, email, memberId);
+						} catch (IOException | SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				
 				
 			}
 		});
@@ -189,24 +190,46 @@ public class EditMember extends JFrame {
 	}
 	
 	private void editMember(String firstName, String lastName, String address, String phoneNumber, String email, int memberId) throws IOException, SQLException  {
-		  Member member = new Member();
-		  member.setFirstName(firstName);
-		  member.setLastName(lastName);
-		  member.setAddress(address);
-		  member.setPhoneNumber(phoneNumber);
-		  member.setEmail(email);
-		  if(newImageFile != null) {
-			  member.setImageData(imgUtil.convertFileToBytes(newImageFile));
-		  }else {
-			  member.setImageData(imgUtil.convertFileToBytes(oldImageFile));
-		  }
-		  
-		  service.editMember(member, memberId);
-		  if(callback != null) {
-				callback.onMemberListUpdated();
+		if(hasMissingInput(firstName, lastName, address, phoneNumber, email)) { 
+			showErrorMessage("showErrorMessage"); return;
+		}else {
+			Member member = new Member();
+			  member.setFirstName(firstName);
+			  member.setLastName(lastName);
+			  member.setAddress(address);
+			  member.setPhoneNumber(phoneNumber);
+			  member.setEmail(email);
+			  if(newImageFile != null) {
+				  member.setImageData(imgUtil.convertFileToBytes(newImageFile));
+			  }else {
+				  member.setImageData(imgUtil.convertFileToBytes(oldImageFile));
+			  }
+			  
+			  service.editMember(member, memberId);
+			  if(callback != null) {
+					callback.onMemberListUpdated();
+			}
+			  JOptionPane.showMessageDialog(null, "Member Updated", "Success", JOptionPane.INFORMATION_MESSAGE);
 		}
-		  JOptionPane.showMessageDialog(null, "Member Updated", "Success", JOptionPane.INFORMATION_MESSAGE);
 	}
+		
+	
+	
+	public  boolean hasMissingInput(String firstName, String lastName, String address, 
+            String phoneNumber, String email) {
+			// Check if any of the String inputs are null or empty
+			return  (firstName == null || firstName.isEmpty()) ||
+					(lastName == null || lastName.isEmpty()) ||
+					(address == null || address.isEmpty()) ||
+					(phoneNumber == null || phoneNumber.isEmpty()) ||
+					(email == null || email.isEmpty());
+			}
+	
+	public  void showErrorMessage(String message) {
+		  JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+		}
+
+
 	
 	private void imgUploadFromFile() {
 		newImageFile = imgUtil.imageUploadFromFile();
@@ -216,5 +239,5 @@ public class EditMember extends JFrame {
 		}
 		
 	}
-
+	
 }

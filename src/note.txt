@@ -36,6 +36,7 @@ ERD Diagram:
 | Email       |        | ReturnDate  |        | ISBN        |
 +-------------+        +-------------+        | Category    |
                                               | CopiesAvailable|
+                                              | ImageData   |
                                               +-------------+
 
 	//USER

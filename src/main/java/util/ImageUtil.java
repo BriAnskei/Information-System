@@ -20,17 +20,20 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ImageUtil {
 
-    public static byte[] convertInputStreamToByteArray(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int nRead;
-        byte[] data = new byte[1024];
-        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
-        buffer.flush();
-        return buffer.toByteArray();
-    }
+	// (Adding)
+	 public static byte[] convertInputStreamToByteArray(InputStream inputStream) throws IOException {
+	        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+	        byte[] buffer = new byte[1024];
+	        int length;
+	        
+	        while ((length = inputStream.read(buffer)) != -1) {
+	            byteArrayOutputStream.write(buffer, 0, length);
+	        }
+	        
+	        return byteArrayOutputStream.toByteArray();
+	    }
     
+	 // Convert byte array into file. (Editing)
     public File convertByteArrayToFile(byte[] byteArray) throws FileNotFoundException, IOException {
     	 // Create a temporary file
         Path tempFilePath = Files.createTempFile(null, null);
@@ -44,6 +47,7 @@ public class ImageUtil {
         return tempFile;
     }
     
+    // Used in editing. before uploading this will convert the selected file into bytes.
     public  byte[] convertFileToBytes(File file) throws IOException {
         byte[] bytesArray = new byte[(int) file.length()];
 
@@ -54,6 +58,7 @@ public class ImageUtil {
         return bytesArray;
     }
 
+    // For image resizing
     public static Image resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
         Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
         BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
@@ -61,6 +66,7 @@ public class ImageUtil {
         return resultingImage;
     }
 
+    //Opens the file chooser to upload Image. used for adding and editing.
     public File imageUploadFromFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif"));
@@ -74,5 +80,9 @@ public class ImageUtil {
     public static BufferedImage convertByteArrayToBufferedImage(byte[] imageData) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(imageData);
         return ImageIO.read(bis);
+    }
+    
+    public  BufferedImage convertFileToBufferedImage(File file) throws IOException {
+        return ImageIO.read(file);
     }
 }

@@ -1,7 +1,5 @@
 package main.java.gui;
 
-import java.awt.EventQueue;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -44,14 +42,13 @@ public class MemberList extends JFrame implements MemberUpdateCallback {
 	private JTextField searchInput;
 	private JTable table;
 	
-	//Info Labels
-	JLabel firstNameLabel;
-	JLabel lastNameLabel;
-	JLabel addressLabel;
-	JLabel contactLabel;
-	JLabel emailLabel;
-	JLabel idLabel;
-	JLabel imgLabel;
+	
+	private JLabel memberName;
+	private JLabel addressLabel;
+	private JLabel contactLabel;
+	private JLabel emailLabel;
+	private JLabel idLabel;
+	private JLabel imgLabel;
 	
 	private int memberId = 0;// Get row ID on table
 	private MemberUpdateCallback callback;
@@ -61,7 +58,7 @@ public class MemberList extends JFrame implements MemberUpdateCallback {
 		this.callback = callback; 
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 781, 450);
+		setBounds(100, 100, 781, 419);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setBackground(new Color(205, 205, 205));
@@ -114,92 +111,45 @@ public class MemberList extends JFrame implements MemberUpdateCallback {
 		btnNewButton.setBounds(326, 62, 139, 30);
 		contentPane.add(btnNewButton);
 		
-		
-				
-		JButton addButton = new JButton("ADD");
-		addButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				AddMember addMember = new AddMember(MemberList.this);
-				addMember.setVisible(true);
-				
-			}
-		});
-		addButton.setBackground(new Color(192, 192, 192));
-		addButton.setBounds(490, 62, 85, 30);
-		contentPane.add(addButton);
-		
-		JButton editbutton = new JButton("EDIT");
-		editbutton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				EditMember editMember;
-				try {
-					editMember = new EditMember(memberId, MemberList.this);
-					editMember.setVisible(true);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			;
-			}
-		});
-		editbutton.setBackground(new Color(192, 192, 192));
-		editbutton.setBounds(581, 62, 85, 30);
-		contentPane.add(editbutton);
-		
-		JButton deleteButton = new JButton("DELETE");
-		deleteButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				deleteMember(memberId);
-			}
-		});
-		deleteButton.setBackground(new Color(192, 192, 192));
-		deleteButton.setBounds(672, 62, 85, 30);
-		contentPane.add(deleteButton);
-		
 		JPanel infoPanel = new JPanel();
 		infoPanel.setBackground(new Color(205, 205, 205));
 		infoPanel.setBorder(new TitledBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)), "Member info", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		infoPanel.setBounds(483, 113, 270, 256);
+		infoPanel.setBounds(483, 62, 270, 307);
 		contentPane.add(infoPanel);
 		infoPanel.setLayout(null);
 		
 		imgLabel = new JLabel("");
-		imgLabel.setBounds(79, 27, 120, 90);
+		imgLabel.setBounds(64, 27, 148, 120);
 		infoPanel.add(imgLabel);
 		
-		firstNameLabel = new JLabel("");
-		firstNameLabel.setBounds(39, 128, 90, 14);
-		infoPanel.add(firstNameLabel);
-		
-	    lastNameLabel = new JLabel("");
-		lastNameLabel.setBounds(139, 128, 105, 14);
-		infoPanel.add(lastNameLabel);
+		memberName = new JLabel("");
+		memberName.setBounds(39, 187, 190, 14);
+		infoPanel.add(memberName);
 		
 		contactLabel = new JLabel("");
-		contactLabel.setBounds(39, 178, 190, 14);
+		contactLabel.setBounds(39, 212, 190, 14);
 		infoPanel.add(contactLabel);
 		
 	    addressLabel = new JLabel("");
-		addressLabel.setBounds(39, 153, 190, 14);
+		addressLabel.setBounds(39, 237, 190, 14);
 		infoPanel.add(addressLabel);
 		
 	    emailLabel = new JLabel("");
-		emailLabel.setBounds(39, 203, 190, 14);
+		emailLabel.setBounds(39, 262, 190, 14);
 		infoPanel.add(emailLabel);
 		
 		idLabel = new JLabel("");
-		idLabel.setBounds(39, 228, 190, 14);
+		idLabel.setBounds(39, 162, 195, 14);
 		infoPanel.add(idLabel);
 		
 		JScrollPane scrollPane = new JScrollPane();
-	    scrollPane.setBounds(10, 121, 455, 248);
+	    scrollPane.setBounds(10, 106, 455, 263);
 	    contentPane.add(scrollPane);
 		
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		
-		// Inside the MemberList class
-
+		// Listener for the selected rows.
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 		  @Override
 		  public void valueChanged(ListSelectionEvent e) {
@@ -208,7 +158,7 @@ public class MemberList extends JFrame implements MemberUpdateCallback {
                   if (selectedRow != -1) {
                       DefaultTableModel model = (DefaultTableModel) table.getModel();
                       memberId = (int) model.getValueAt(selectedRow, 0);
-                      displayMemberInfo(Integer.toString(memberId));
+                      displayMemberInfo(Integer.toString(memberId)); // Display the select row info.
                   }
               }
           }
@@ -232,8 +182,7 @@ public class MemberList extends JFrame implements MemberUpdateCallback {
 	  
 	  private void resetInfoCard() {
 		  idLabel.setText(null);
-          firstNameLabel.setText(null);
-          lastNameLabel.setText(null);
+          memberName.setText(null);
           addressLabel.setText(null);
           contactLabel.setText(null);
           emailLabel.setText(null);
@@ -269,16 +218,15 @@ public class MemberList extends JFrame implements MemberUpdateCallback {
 	            searchedMembers = service.searchMember(search);
 	            for (Member member : searchedMembers) {
 	                try {
-	                	
+	                	 // Convert ByteArray into buffedImg and store in IageIcon with the current size of the ImageLabel
 	                    BufferedImage buffedImg = ImageUtil.convertByteArrayToBufferedImage(member.getImageData());
 	                    ImageIcon icon = new ImageIcon(ImageUtil.resizeImage(buffedImg, imgLabel.getWidth(), imgLabel.getHeight()));
 
-	                    idLabel.setText(Integer.toString(member.getMemberId()));
-	                    firstNameLabel.setText(member.getFirstName());
-	                    lastNameLabel.setText(member.getLastName());
-	                    addressLabel.setText(member.getAddress());
-	                    contactLabel.setText(member.getPhoneNumber());
-	                    emailLabel.setText(member.getEmail());
+	                    idLabel.setText("ID: " + Integer.toString(member.getMemberId()));
+	                    memberName.setText("Name: " + member.getFirstName());
+	                    addressLabel.setText("Address: " + member.getAddress());
+	                    contactLabel.setText("Contact: " + member.getPhoneNumber());
+	                    emailLabel.setText("Email: " + member.getEmail());
 	                    imgLabel.setIcon(icon);
 	                } catch (IOException ex) {
 	                    ex.printStackTrace();
@@ -287,30 +235,6 @@ public class MemberList extends JFrame implements MemberUpdateCallback {
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
-	 }
-	 
-	 private void deleteMember(int memberId)  {
-		if(memberId == 0) return;
-		
-			 int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to proceed?", "Confirmation", JOptionPane.YES_NO_OPTION);
-			 
-			 if(response == JOptionPane.YES_OPTION) {
-				 try {
-					service.Delete(memberId);
-					// Refresh the table and reset card info
-					resetInfoCard();
-					 loadTable();
-					 
-					memberListUpdated(); // Call to notify other applications
-					
-					 JOptionPane.showMessageDialog(null, "Member Deleted", "Success", JOptionPane.INFORMATION_MESSAGE);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			 }
-			
-		
 	 }
 	 
 	 // notify other parts of the application that the member list has been updated.

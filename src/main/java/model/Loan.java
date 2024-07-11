@@ -9,6 +9,7 @@ public class Loan {
     private Date issueDate;
     private Date dueDate;
     private Date returnDate;
+ 
 
     // Constructor
     public Loan() {
@@ -71,6 +72,8 @@ public class Loan {
     public void setReturnDate(Date returnDate) {
         this.returnDate = returnDate;
     }
+  
+
 
     // toString method (optional, for easy printing)
     @Override

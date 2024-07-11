@@ -11,16 +11,19 @@ import main.java.util.DatabaseConnection;
 
 public class MemberDAO {
 	 public void addMember(Member member) throws SQLException, FileNotFoundException, IOException {
-		 String query = "INSERT INTO Member (FirstName, LastName, Address, PhoneNumber, Email, ImageData) VALUES (?, ?, ?, ?, ?, ?)";
+		  String query = "INSERT INTO member (UserID, firstName, lastName, address, phoneNumber, email, imageData) VALUES (?, ?, ?, ?, ?, ?, ?)";
 	        try (Connection connection = DatabaseConnection.getConnection();
-	             PreparedStatement pstmt = connection.prepareStatement(query)) {
-	            pstmt.setString(1, member.getFirstName());
-	            pstmt.setString(2, member.getLastName());
-	            pstmt.setString(3, member.getAddress());
-	            pstmt.setString(4, member.getPhoneNumber());
-	            pstmt.setString(5, member.getEmail());
-	            pstmt.setBytes(6, member.getImageData());
-	            pstmt.executeUpdate();
+	             PreparedStatement statement = connection.prepareStatement(query)) {
+	            
+	            statement.setInt(1, member.getUserId());
+	            statement.setString(2, member.getFirstName());
+	            statement.setString(3, member.getLastName());
+	            statement.setString(4, member.getAddress());
+	            statement.setString(5, member.getPhoneNumber());
+	            statement.setString(6, member.getEmail());
+	            statement.setBytes(7, member.getImageData());
+	            
+	            statement.executeUpdate();
 	        }
 	    }
 	 
@@ -34,15 +37,14 @@ public class MemberDAO {
 	             PreparedStatement statement = connection.prepareStatement(query);
 	             ResultSet resultSet = statement.executeQuery()) {
 	            while (resultSet.next()) {
-	                Member member = new Member(resultSet.getInt("MemberID"), resultSet.getString("FirstName"), resultSet.getString("LastName"), resultSet.getString("Address"), resultSet.getString("PhoneNumber"), resultSet.getString("Email"), resultSet.getBytes("ImageData"));
+	                Member member = new Member(resultSet.getInt("MemberID"), resultSet.getInt("UserID"),  resultSet.getString("FirstName"), resultSet.getString("LastName"), resultSet.getString("Address"), resultSet.getString("PhoneNumber"), resultSet.getString("Email"), resultSet.getBytes("ImageData"));
 	                members.add(member);
 	            }
 	        }
 	        return members;
 	    }
 	
-
-	  
+	  // Usable  for  Admin only
 	  public List<Member> searchMember(String input) {
 		  List<Member> members = new ArrayList<>();
 	        String query = "SELECT * FROM member WHERE MemberID = ? OR FirstName = ?";
@@ -54,6 +56,7 @@ public class MemberDAO {
 	                while (resultSet.next()) {
 	                    Member member = new Member(
 	                            resultSet.getInt("MemberID"),
+	                            resultSet.getInt("UserID"),
 	                            resultSet.getString("FirstName"),
 	                            resultSet.getString("LastName"),
 	                            resultSet.getString("Address"),
@@ -90,9 +93,7 @@ public class MemberDAO {
 	            statement.executeUpdate();
 	        }
 	    }
-	  
-	  
-	  
+	 
 	  public int countTotalMember() throws SQLException {
 		  int totalMembers = 0;
 		  String query = "SELECT COUNT(*) AS total_rows FROM member";
@@ -109,9 +110,7 @@ public class MemberDAO {
 		  return totalMembers;
 		  
 	  }
-	  
-	  
-	  
+	 
 	  public void DeleteMemberById(int memberId) throws SQLException {
 		  String query = "DELETE FROM member WHERE MemberID = ?";
 	        try (Connection connection = DatabaseConnection.getConnection();
@@ -121,4 +120,56 @@ public class MemberDAO {
 	            statement.executeUpdate();
 	        }
 	  }
+	  
+	  // Validation for user membership.
+	  public boolean membershipValidation(int userId) {
+		    String query = "SELECT COUNT(*) FROM Member WHERE UserID = ?";
+		    try (Connection connection = DatabaseConnection.getConnection();
+		         PreparedStatement statement = connection.prepareStatement(query)) {
+		        
+		        statement.setInt(1, userId);
+		        
+		        try (ResultSet resultSet = statement.executeQuery()) {
+		            if (resultSet.next()) {
+		                int count = resultSet.getInt(1);
+		                return count > 0;
+		            }
+		        }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    }
+		    return false; 
+		}
+	  
+	  public Member getMemberByUserId(int userId) {
+	        Member member = null;
+	        String query = "SELECT * FROM member WHERE UserId = ?";
+	        
+	        try (Connection connection = DatabaseConnection.getConnection();
+	             PreparedStatement statement = connection.prepareStatement(query)) {
+	   
+	            statement.setInt(1, userId);
+	            
+	            try (ResultSet resultSet = statement.executeQuery()) {
+	                if (resultSet.next()) {
+	                    member = new Member(
+	                        resultSet.getInt("MemberID"),
+	                        resultSet.getInt("UserID"),
+	                        resultSet.getString("FirstName"),
+	                        resultSet.getString("LastName"),
+	                        resultSet.getString("Address"),
+	                        resultSet.getString("PhoneNumber"),
+	                        resultSet.getString("Email"),
+	                        resultSet.getBytes("ImageData")
+	                    );
+	                }
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	            // Handle exceptions properly based on your application's needs
+	        }
+	        
+	        return member;
+	    }
+
 }

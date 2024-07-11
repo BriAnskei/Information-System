@@ -4,6 +4,7 @@ package main.java.model;
 
 public class Member {
 	private int memberId;
+	private int userId;
     private String firstName;
     private String lastName;
     private String address;
@@ -16,7 +17,7 @@ public class Member {
     public Member() {
     }
 
-    public Member(int memberId, String firstName, String lastName, String address, String phoneNumber, String email, byte[] imageData) {
+    public Member(int memberId,int userId,  String firstName, String lastName, String address, String phoneNumber, String email, byte[] imageData) {
     	this.memberId = memberId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -27,6 +28,14 @@ public class Member {
     }
 
     // Getters and Setters 
+    public int getUserId() {
+    	return userId;
+    }
+    
+    public void setUserId(int userId) {
+    	this.userId = userId;
+    }
+    
     public int getMemberId() {
     	return memberId;
     }

@@ -3,6 +3,7 @@ package main.java.gui;
 import main.java.service.MemberService;
 import main.java.util.ImageUtil;
 import main.java.Callback.*;
+import main.java.model.User;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,12 +25,13 @@ import javax.swing.ImageIcon;
 import java.awt.Font;
 
 
-public class AddMember extends JFrame {
+public class MembershipForm extends JFrame {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private MemberUpdateCallback callback;
 	private JPanel contentPane;
 	private JTextField userFirstN;
 	private JTextField userLastN;
@@ -46,18 +48,20 @@ public class AddMember extends JFrame {
 	
 	private File selectedFile;
 	
-	private MemberUpdateCallback callback;
+	private User loggedUser;
 
  
 
-	public AddMember(MemberUpdateCallback callback) {
+	public MembershipForm(MemberUpdateCallback callback, User loggedUser) {
 		this.callback = callback;
+		this.loggedUser = loggedUser;
 		
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 433, 470);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBackground(new Color(205, 205, 205));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -151,7 +155,7 @@ public class AddMember extends JFrame {
 		JButton imgUpload = new JButton("Browse");
 		imgUpload.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				imgUploadFromFile();
+				imgUploadFromFile(); // Open the file to choose image
 			}
 		});
 		imgUpload.setBounds(302, 398, 89, 23);
@@ -169,12 +173,10 @@ public class AddMember extends JFrame {
 	ImageUtil imgUtil = new ImageUtil();
 	
 	private void addNewMember(String firstName, String lastName, String address, String phoneNumber, String email) throws FileNotFoundException, IOException, SQLException {
-		service.addMember(firstName, lastName, address, phoneNumber, email, selectedFile);
-		// notify other parts of the application that the member list has been updated.
-		if(callback != null) {
-			callback.onMemberListUpdated();
-		}
-		 JOptionPane.showMessageDialog(null, "Member Added", "Success", JOptionPane.INFORMATION_MESSAGE);
+		service.addMember(loggedUser.getUserId(), firstName, lastName, address, phoneNumber, email, selectedFile);
+		 JOptionPane.showMessageDialog(null, "Registration Succesfull", "Success", JOptionPane.INFORMATION_MESSAGE);
+		 memberUpdate();
+		 dispose();
 	}
 	
 	private void imgUploadFromFile() {
@@ -183,7 +185,12 @@ public class AddMember extends JFrame {
 		if(selectedFile != null) {
 			imgNameLabel.setText(selectedFile.getName());
 		}
-		
+	}
+	
+	private void memberUpdate() {
+		if(callback != null) {
+			callback.onMemberListUpdated();
+		}
 	}
 }
 
